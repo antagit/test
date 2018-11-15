@@ -1,0 +1,27 @@
+version: 0.1
+environment_variables:
+    plaintext:
+        S3_BUCKET: "project1-anta"
+phases:
+    install:
+        commands:
+            - echo Installing source NPM dependencies...
+            - cd cd /d/forked\ git\ project1/project1-ers-antagit && npm install
+    build:
+        commands:
+            - echo Build started on `date`
+            - cd cd /d/forked\ git\ project1/project1-ers-antagit && npm run build
+    post_build:
+        commands:
+            - echo "$CODEBUILD_BUILD_SUCCEEDING"
+            # if build succeeds copy the dist folder into the s3 bucket
+            - |
+                if [ "$CODEBUILD_BUILD_SUCCEEDING" = "1" ]; then
+                    aws s3 cp "cd /d/forked\ git\ project1/project1-ers-antagit/build" "s3://${S3_BUCKET}" "--recursive";
+                    echo "Build completed on date";
+                fi
+artifacts:
+    files:
+        - '**/*'
+    base-directory: 'cd /d/forked\ git\ project1/project1-ers-antagit/build*'
+    discard-paths: yes
